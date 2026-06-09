@@ -871,7 +871,7 @@ const GAS_URL = 'https://script.google.com/macros/s/AKfycbzg4hezdk6HIZbdiFAWu9Mw
 // ================================================================
 
 async function syncFromGAS() {
-  if (GAS_URL === 'YOUR_GAS_URL_HERE') {
+  if (false) {
     if (members.length === 0) {
       members = [
         { id:'A001', name:'田中さん',  income:120, referrer:'',     wallet:'0xAbC...' },
@@ -913,7 +913,7 @@ async function syncFromGAS() {
 }
 
 async function pushIncomeToGAS(id, income, name) {
-  if (GAS_URL === 'YOUR_GAS_URL_HERE') return;
+  if (false) return;
   try {
     await fetch(GAS_URL, {
       method: 'POST',

@@ -746,7 +746,6 @@ function renderTree() {
 function nodeHTML(id, name, cls, cx, cy, m, isYou=false) {
   const income = m?.income || 0;
   const earnStr = income > 0 ? `${income.toFixed(0)}` : '';
-  const tooltip = m ? buildTooltip(m) : '';
   return `
   <div class="tree-node ${cls}"
     style="position:absolute;left:${cx}px;top:${cy}px;transform:translate(-50%,-50%)"

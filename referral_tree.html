@@ -577,8 +577,15 @@ function getReferrerName(id) {
 }
 
 function getL1L2(m) {
-  const l1id = (m.referrer && m.referrer !== YOUR_ID) ? m.referrer : null;
-  const l1m  = l1id ? members.find(x => x.id === l1id) : null;
+  // mの直紹介者
+  const refId = m.referrer;
+  // 直紹介者があなた → このメンバーはL1、L1報酬受取者なし、L2報酬受取者なし
+  if (!refId || refId === YOUR_ID) return { l1id: null, l2id: null };
+  // 直紹介者が存在する → L1報酬はその人が受取
+  const l1id = refId;
+  const l1m  = members.find(x => x.id === l1id);
+  // L1の紹介者があなた → L2報酬受取者なし
+  // L1の紹介者が別の人 → その人がL2報酬受取
   const l2id = (l1m && l1m.referrer && l1m.referrer !== YOUR_ID) ? l1m.referrer : null;
   return { l1id, l2id };
 }
@@ -860,7 +867,7 @@ function render() {
 // ================================================================
 // ★ ここにGASのURLを貼り付けてください（register.htmlと同じURL）★
 // ================================================================
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbzg4hezdk6HIZbdiFAWu9MwUlQ9wiIxbugy4S8ONoSeNKnLBnWm8M-OCeCpM0s6dYE/exec';
+const GAS_URL = 'YOUR_GAS_URL_HERE';
 // ================================================================
 
 async function syncFromGAS() {

@@ -560,24 +560,26 @@ function deleteMember(id) {
   save(); render();
 }
 
+// ── あなたのID ────────────────────────────────────────────────────
+const YOUR_ID = '21Q46';
+
 // ── Compute ───────────────────────────────────────────────────────
 function getLevel(m) {
-  if (!m.referrer) return 1;           // direct from you
+  if (m.referrer === YOUR_ID) return 1;
   const ref = members.find(x => x.id === m.referrer);
-  if (!ref || !ref.referrer) return 2; // ref is L1 → m is L2
-  return 3;                            // deeper
+  if (ref && ref.referrer === YOUR_ID) return 2;
+  return 3;
 }
 
 function getReferrerName(id) {
-  if (!id) return 'あなた';
+  if (!id || id === YOUR_ID) return 'あなた';
   return members.find(x => x.id === id)?.name || id;
 }
 
 function getL1L2(m) {
-  // L1 of m = m.referrer, L2 of m = m.referrer's referrer
-  const l1id = m.referrer;
+  const l1id = (m.referrer && m.referrer !== YOUR_ID) ? m.referrer : null;
   const l1m  = l1id ? members.find(x => x.id === l1id) : null;
-  const l2id = l1m?.referrer;
+  const l2id = (l1m && l1m.referrer && l1m.referrer !== YOUR_ID) ? l1m.referrer : null;
   return { l1id, l2id };
 }
 
@@ -662,9 +664,12 @@ function renderTree() {
   empty.style.display   = 'none';
   content.style.display = 'block';
 
-  // Build levels: you → L1 (direct from you) → L2 (referrer is L1)
-  const l1 = members.filter(m => !m.referrer);
-  const l2 = members.filter(m => m.referrer && !members.find(x=>x.id===m.referrer)?.referrer);
+  // Build levels using YOUR_ID as root
+  const l1 = members.filter(m => m.referrer === YOUR_ID);
+  const l2 = members.filter(m => {
+    const ref = members.find(x => x.id === m.referrer);
+    return ref && ref.referrer === YOUR_ID;
+  });
 
   const NODE_W = 100; // node slot width
   const NODE_H = 72;
@@ -855,7 +860,7 @@ function render() {
 // ================================================================
 // ★ ここにGASのURLを貼り付けてください（register.htmlと同じURL）★
 // ================================================================
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbzg4hezdk6HIZbdiFAWu9MwUlQ9wiIxbugy4S8ONoSeNKnLBnWm8M-OCeCpM0s6dYE/exec';
+const GAS_URL = 'YOUR_GAS_URL_HERE';
 // ================================================================
 
 async function syncFromGAS() {

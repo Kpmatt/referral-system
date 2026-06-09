@@ -855,11 +855,11 @@ function render() {
 // ================================================================
 // ★ ここにGASのURLを貼り付けてください（register.htmlと同じURL）★
 // ================================================================
-const GAS_URL = 'ここにGASのURLを貼る';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxzBB5XK3q5P9TEkxiOLbhf3z6c1T6hJtvSmwQVqSyBdbg7nZNFnBfu8kLu4Tb-PWJs/exec';
 // ================================================================
 
 async function syncFromGAS() {
-  if (GAS_URL === 'ここにGASのURLを貼る') {
+  if (GAS_URL === 'https://script.google.com/macros/s/AKfycbxzBB5XK3q5P9TEkxiOLbhf3z6c1T6hJtvSmwQVqSyBdbg7nZNFnBfu8kLu4Tb-PWJs/exec') {
     if (members.length === 0) {
       members = [
         { id:'A001', name:'田中さん',  income:120, referrer:'',     wallet:'0xAbC...' },
@@ -901,7 +901,7 @@ async function syncFromGAS() {
 }
 
 async function pushIncomeToGAS(id, income, name) {
-  if (GAS_URL === 'ここにGASのURLを貼る') return;
+  if (GAS_URL === 'https://script.google.com/macros/s/AKfycbxzBB5XK3q5P9TEkxiOLbhf3z6c1T6hJtvSmwQVqSyBdbg7nZNFnBfu8kLu4Tb-PWJs/exec') return;
   try {
     await fetch(GAS_URL, {
       method: 'POST',

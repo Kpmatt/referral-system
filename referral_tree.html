@@ -579,14 +579,15 @@ function getReferrerName(id) {
 function getL1L2(m) {
   // mの直紹介者
   const refId = m.referrer;
-  // 直紹介者があなた → このメンバーはL1、L1報酬受取者なし、L2報酬受取者なし
+  // 直紹介者があなた or なし → L1自身、報酬受取者なし
   if (!refId || refId === YOUR_ID) return { l1id: null, l2id: null };
-  // 直紹介者が存在する → L1報酬はその人が受取
+  // L1報酬 = 直紹介者
   const l1id = refId;
   const l1m  = members.find(x => x.id === l1id);
-  // L1の紹介者があなた → L2報酬受取者なし
-  // L1の紹介者が別の人 → その人がL2報酬受取
-  const l2id = (l1m && l1m.referrer && l1m.referrer !== YOUR_ID) ? l1m.referrer : null;
+  // L1の直紹介者があなた → L2なし
+  // L1の直紹介者が別の人 → その人がL2報酬受取
+  const l2refId = l1m?.referrer;
+  const l2id = (l2refId && l2refId !== YOUR_ID) ? l2refId : null;
   return { l1id, l2id };
 }
 
@@ -671,76 +672,75 @@ function renderTree() {
   empty.style.display   = 'none';
   content.style.display = 'block';
 
-  // Build levels using YOUR_ID as root
-  const l1 = members.filter(m => m.referrer === YOUR_ID);
-  const l2 = members.filter(m => {
-    const ref = members.find(x => x.id === m.referrer);
-    return ref && ref.referrer === YOUR_ID;
-  });
-
-  const NODE_W = 100; // node slot width
-  const NODE_H = 72;
-  const LEVEL_GAP = 90;
-  const NODE_R = 36; // radius
-
-  // Layout
-  // Calculate total width needed
-  const maxPerRow = Math.max(1, l1.length, l2.length);
-  const totalW = Math.max(400, maxPerRow * (NODE_W + 20) + 80);
-
-  // Helper: x center for index in N items in totalW
-  function xFor(i, n) {
-    const spacing = Math.min(NODE_W + 20, (totalW - 80) / Math.max(1, n));
-    const start   = (totalW - spacing * (n-1)) / 2;
-    return start + spacing * i;
+  // Build tree structure recursively
+  function getChildren(parentId) {
+    return members.filter(m => m.referrer === parentId);
   }
 
-  const youX = totalW / 2;
-  const youY = NODE_R + 10;
+  const NODE_W  = 90;
+  const NODE_H  = 90;
+  const H_GAP   = 20;
+  const V_GAP   = 70;
 
-  // positions
-  const positions = {};
-  positions['__you__'] = { x: youX, y: youY };
-  l1.forEach((m, i) => {
-    positions[m.id] = { x: xFor(i, l1.length), y: youY + LEVEL_GAP + NODE_R };
-  });
-  l2.forEach((m, i) => {
-    positions[m.id] = { x: xFor(i, l2.length), y: youY + (LEVEL_GAP + NODE_R) * 2 };
-  });
+  // Calculate subtree width
+  function subtreeWidth(id) {
+    const children = id === '__you__' ? members.filter(m => m.referrer === YOUR_ID) : getChildren(id);
+    if (children.length === 0) return NODE_W;
+    const total = children.reduce((s, c) => s + subtreeWidth(c.id), 0);
+    return Math.max(NODE_W, total + H_GAP * (children.length - 1));
+  }
 
-  const svgH = youY + (LEVEL_GAP + NODE_R) * (l2.length > 0 ? 2 : 1) + NODE_R + 60;
-
-  // SVG lines
+  // Collect all nodes with positions
+  const nodes = [];
   const lines = [];
-  // you → L1
-  l1.forEach(m => {
-    const p = positions[m.id];
-    lines.push(`<line x1="${youX}" y1="${youY+NODE_R}" x2="${p.x}" y2="${p.y-NODE_R}" class="connector"/>`);
-  });
-  // L1 → L2
-  l2.forEach(m => {
-    const refPos = positions[m.referrer];
-    const myPos  = positions[m.id];
-    if (refPos && myPos) {
-      lines.push(`<line x1="${refPos.x}" y1="${refPos.y+NODE_R}" x2="${myPos.x}" y2="${myPos.y-NODE_R}" class="connector"/>`);
-    }
-  });
 
-  // Build HTML
-  let html = `<svg class="tree-svg" width="${totalW}" height="${svgH}" style="width:${totalW}px;height:${svgH}px">${lines.join('')}</svg>`;
-  html += `<div style="position:relative;width:${totalW}px;height:${svgH}px">`;
+  function layoutNode(id, name, x, y, isYou) {
+    nodes.push({ id, name, x, y, isYou, m: isYou ? null : members.find(n => n.id === id) });
+    const children = isYou
+      ? members.filter(m => m.referrer === YOUR_ID)
+      : getChildren(id);
+    if (children.length === 0) return;
 
-  // You node
-  html += nodeHTML('__you__', 'あなた', 'node-you', youX, youY, null, true);
-  // L1 nodes
-  l1.forEach(m => html += nodeHTML(m.id, m.name, 'node-l1', positions[m.id].x, positions[m.id].y, m));
-  // L2 nodes
-  l2.forEach(m => html += nodeHTML(m.id, m.name, 'node-l2', positions[m.id].x, positions[m.id].y, m));
+    const totalW = children.reduce((s, c) => s + subtreeWidth(c.id), 0) + H_GAP * (children.length - 1);
+    let cx = x - totalW / 2;
+    children.forEach(child => {
+      const cw = subtreeWidth(child.id);
+      const childX = cx + cw / 2;
+      const childY = y + NODE_H / 2 + V_GAP + NODE_H / 2;
+      lines.push({ x1: x, y1: y + NODE_H / 2, x2: childX, y2: childY - NODE_H / 2 });
+      layoutNode(child.id, child.name, childX, childY, false);
+      cx += cw + H_GAP;
+    });
+  }
+
+  const rootW = subtreeWidth('__you__');
+  const startX = Math.max(rootW / 2, 300);
+  const startY = NODE_H / 2 + 20;
+  layoutNode('__you__', 'あなた', startX, startY, true);
+
+  // Calculate canvas size
+  const maxX = Math.max(...nodes.map(n => n.x + NODE_W / 2)) + 40;
+  const maxY = Math.max(...nodes.map(n => n.y + NODE_H / 2)) + 40;
+
+  let html = `<svg class="tree-svg" width="${maxX}" height="${maxY}" style="width:${maxX}px;height:${maxY}px">`;
+  lines.forEach(l => {
+    html += `<line x1="${l.x1}" y1="${l.y1}" x2="${l.x2}" y2="${l.y2}" class="connector"/>`;
+  });
+  html += `</svg>`;
+  html += `<div style="position:relative;width:${maxX}px;height:${maxY}px">`;
+
+  nodes.forEach(n => {
+    const cls = n.isYou ? 'node-you' : (() => {
+      const lv = getLevel(n.m);
+      return lv === 1 ? 'node-l1' : lv === 2 ? 'node-l2' : 'node-l3';
+    })();
+    html += nodeHTML(n.id, n.name, cls, n.x, n.y, n.m, n.isYou);
+  });
 
   html += '</div>';
   content.innerHTML = html;
-  content.style.width  = totalW + 'px';
-  content.style.height = svgH + 'px';
+  content.style.width  = maxX + 'px';
+  content.style.height = maxY + 'px';
 }
 
 function nodeHTML(id, name, cls, cx, cy, m, isYou=false) {

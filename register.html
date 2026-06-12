@@ -3,21 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>投資家登録フォーム</title>
+<title>UniPoot 投資家登録フォーム</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=swap');
 
   :root {
-    --bg: #0a0a10;
-    --surface: #111118;
-    --card: #16161f;
-    --border: #1e1e30;
-    --accent: #e94560;
+    --bg: #0a0a12;
+    --surface: #0f0f1a;
+    --card: #13131e;
+    --border: #1e1e35;
+    --accent: #e040a0;
+    --accent2: #7b4fe0;
+    --accent3: #ff6eb4;
     --green: #00d4aa;
     --gold: #f5a623;
     --text: #eaecf4;
-    --muted: #5a5c72;
-    --input-bg: #0d0d16;
+    --muted: #5a5c78;
+    --input-bg: #0d0d18;
+    --grad: linear-gradient(135deg, #7b4fe0, #e040a0, #ff6eb4);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -41,8 +44,8 @@
     position: fixed;
     inset: 0;
     background-image:
-      linear-gradient(rgba(233,69,96,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(233,69,96,0.03) 1px, transparent 1px);
+      linear-gradient(rgba(123,79,224,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(224,64,160,0.04) 1px, transparent 1px);
     background-size: 40px 40px;
     pointer-events: none;
   }
@@ -54,7 +57,7 @@
     top: -200px; left: 50%;
     transform: translateX(-50%);
     width: 600px; height: 400px;
-    background: radial-gradient(ellipse, rgba(233,69,96,0.08) 0%, transparent 70%);
+    background: radial-gradient(ellipse, rgba(123,79,224,0.12) 0%, rgba(224,64,160,0.06) 50%, transparent 70%);
     pointer-events: none;
   }
 
@@ -74,8 +77,8 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: rgba(233,69,96,0.1);
-    border: 1px solid rgba(233,69,96,0.25);
+    background: rgba(123,79,224,0.12);
+    border: 1px solid rgba(224,64,160,0.3);
     border-radius: 100px;
     padding: 6px 16px;
     margin-bottom: 16px;
@@ -84,7 +87,7 @@
     width: 7px; height: 7px;
     background: var(--accent);
     border-radius: 50%;
-    box-shadow: 0 0 10px var(--accent);
+    box-shadow: 0 0 10px var(--accent2);
     animation: blink 2s infinite;
   }
   @keyframes blink {
@@ -93,7 +96,7 @@
   .brand-badge span {
     font-size: 11px;
     font-weight: 700;
-    color: var(--accent);
+    color: var(--accent3);
     letter-spacing: 0.12em;
     text-transform: uppercase;
   }
@@ -128,7 +131,7 @@
     position: absolute;
     top: 0; left: 0; right: 0;
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(233,69,96,0.4), transparent);
+    background: linear-gradient(90deg, transparent, rgba(123,79,224,0.5), rgba(224,64,160,0.5), transparent);
   }
 
   /* Steps indicator */
@@ -158,9 +161,9 @@
   }
   .step.active .step-circle {
     border-color: var(--accent);
-    background: var(--accent);
+    background: var(--grad);
     color: #fff;
-    box-shadow: 0 0 12px rgba(233,69,96,0.4);
+    box-shadow: 0 0 12px rgba(224,64,160,0.4);
   }
   .step.done .step-circle {
     border-color: var(--green);
@@ -228,8 +231,8 @@
   }
   .form-input::placeholder { color: var(--muted); font-size: 13px; }
   .form-input:focus {
-    border-color: rgba(233,69,96,0.5);
-    box-shadow: 0 0 0 3px rgba(233,69,96,0.08);
+    border-color: rgba(224,64,160,0.5);
+    box-shadow: 0 0 0 3px rgba(123,79,224,0.1);
   }
   .form-input.mono { font-family: 'Space Mono', monospace; font-size: 14px; }
   .form-input.error { border-color: rgba(233,69,96,0.6); }
@@ -257,7 +260,7 @@
     margin-bottom: 24px;
     transition: border-color 0.2s;
   }
-  .agreement:hover { border-color: rgba(233,69,96,0.3); }
+  .agreement:hover { border-color: rgba(224,64,160,0.3); }
   .agreement input { display: none; }
   .check-box {
     width: 18px; height: 18px; min-width: 18px;
@@ -280,7 +283,7 @@
   .submit-btn {
     width: 100%;
     padding: 16px;
-    background: linear-gradient(135deg, #e94560, #c73652);
+    background: var(--grad);
     border: none;
     border-radius: 12px;
     color: #fff;
@@ -349,7 +352,7 @@
   /* ID display box */
   .id-reveal {
     background: var(--input-bg);
-    border: 1px solid rgba(0,212,170,0.3);
+    border: 1px solid rgba(123,79,224,0.3);
     border-radius: 16px;
     padding: 24px;
     margin-bottom: 20px;
@@ -360,7 +363,7 @@
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0; height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(0,212,170,0.5), transparent);
+    background: var(--grad);
   }
   .id-reveal-label {
     font-size: 11px;
@@ -401,7 +404,7 @@
   }
   .copy-btn {
     background: rgba(0,212,170,0.1);
-    border: 1px solid rgba(0,212,170,0.3);
+    border: 1px solid rgba(123,79,224,0.3);
     border-radius: 8px;
     padding: 8px 12px;
     color: var(--green);
@@ -496,9 +499,9 @@
   <div class="brand">
     <div class="brand-badge">
       <div class="brand-dot"></div>
-      <span>Investor Registration</span>
+      <span>UniPoot Registration</span>
     </div>
-    <h1>投資家<em>登録</em>フォーム</h1>
+    <h1><em>UniPoot</em> 登録フォーム</h1>
     <p>以下の必要事項を入力して登録を完了してください</p>
   </div>
 
@@ -527,8 +530,19 @@
     <div id="form-fields">
       <div class="form-group">
         <div class="form-label">
-          直紹介者ID <span class="req">*</span>
+          表示名 <span class="opt">ご自由に入力ください</span>
         </div>
+        <input
+          class="form-input"
+          id="display-name"
+          type="text"
+          placeholder="例：田中、Tanaka、たろう など"
+          maxlength="30"
+        >
+        <div class="input-hint">本名でなくてもOKです</div>
+      </div>
+
+      <div class="form-group">
         <input
           class="form-input mono"
           id="referrer-id"
@@ -592,6 +606,10 @@
     <div class="summary-card">
       <div class="summary-title">登録情報</div>
       <div class="summary-row">
+        <span class="summary-key">表示名</span>
+        <span class="summary-val" id="sum-name">—</span>
+      </div>
+      <div class="summary-row">
         <span class="summary-key">直紹介者ID</span>
         <span class="summary-val" id="sum-referrer">—</span>
       </div>
@@ -623,7 +641,7 @@
 // ★ ここにGASのURLを貼り付けてください ★
 // デプロイ後に発行されるURLをコピーしてここに入れる
 // ================================================================
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbzg4hezdk6HIZbdiFAWu9MwUlQ9wiIxbugy4S8ONoSeNKnLBnWm8M-OCeCpM0s6dYE/exec';
+const GAS_URL = 'YOUR_GAS_URL_HERE';
 // ================================================================
 
 let agreed = false;
@@ -682,9 +700,9 @@ function updateSubmitBtn() {
 async function handleSubmit() {
   const referrerId = document.getElementById('referrer-id').value.trim().toUpperCase();
   const wallet     = document.getElementById('wallet-addr').value.trim();
+  const displayName = document.getElementById('display-name').value.trim();
   if (!isValidReferrer(referrerId) || !isValidWallet(wallet)) return;
 
-  // ボタン無効化＆ローディング
   const btn = document.getElementById('submit-btn');
   btn.disabled = true;
   btn.textContent = '送信中...';
@@ -693,12 +711,11 @@ async function handleSubmit() {
   try {
     const res = await fetch(GAS_URL, {
       method: 'POST',
-      body: JSON.stringify({ action: 'register', referrerId, wallet }),
+      body: JSON.stringify({ action: 'register', referrerId, wallet, displayName }),
     });
     const result = await res.json();
 
     if (!result.ok) {
-      // エラー表示
       btn.disabled = false;
       btn.textContent = '登録して紹介者IDを受け取る →';
       setStep(1);
@@ -706,14 +723,13 @@ async function handleSubmit() {
       return;
     }
 
-    // 成功
     const now = new Date();
     const dateStr = now.toLocaleDateString('ja-JP', {
       year:'numeric', month:'2-digit', day:'2-digit',
       hour:'2-digit', minute:'2-digit'
     });
     setStep(3);
-    showSuccess(result.myId, referrerId, wallet, dateStr);
+    showSuccess(result.myId, referrerId, wallet, dateStr, displayName);
 
   } catch (err) {
     btn.disabled = false;
@@ -733,7 +749,7 @@ function setStep(n) {
   }
 }
 
-function showSuccess(myId, referrerId, wallet, dateStr) {
+function showSuccess(myId, referrerId, wallet, dateStr, displayName) {
   document.getElementById('form-fields').style.display   = 'none';
   document.getElementById('success-screen').style.display = 'block';
   document.getElementById('issued-id').textContent        = myId;
@@ -741,6 +757,7 @@ function showSuccess(myId, referrerId, wallet, dateStr) {
   document.getElementById('sum-wallet').textContent       = wallet.slice(0,10) + '…' + wallet.slice(-6);
   document.getElementById('sum-date').textContent         = dateStr;
   document.getElementById('sum-id').textContent           = myId;
+  document.getElementById('sum-name').textContent         = displayName || '（未入力）';
 }
 
 function copyId() {

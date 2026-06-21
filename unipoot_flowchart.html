@@ -474,18 +474,18 @@
   <!-- STEP 1: 既存の暗号通貨 -->
   <div class="step-card" id="card-crypto">
     <div class="step-num"><span class="step-dot"></span>STEP 2</div>
-    <div class="step-question">すでに暗号通貨（仮想通貨）をお持ちですか？</div>
-    <div class="step-sub">別の取引所やウォレットにETHなどの暗号通貨がある場合はYESを選んでください</div>
+    <div class="step-question">お持ちの暗号通貨（仮想通貨）を利用しますか？</div>
+    <div class="step-sub">別の取引所やウォレットにある暗号通貨をMetaMaskへ送金して利用する場合はYESを選んでください</div>
     <div class="choices row">
       <button class="choice-btn style-yes" onclick="selectCrypto(true)">
         <span class="btn-icon">✅</span>
-        <span class="btn-label">YES　持っている</span>
-        <span class="btn-desc">取引所・ウォレットに<br>すでに暗号通貨がある</span>
+        <span class="btn-label">YES　使う</span>
+        <span class="btn-desc">取引所・ウォレットの<br>暗号通貨を送金して利用する</span>
       </button>
       <button class="choice-btn style-no" onclick="selectCrypto(false)">
         <span class="btn-icon">❌</span>
-        <span class="btn-label">NO　持っていない</span>
-        <span class="btn-desc">今から日本円で<br>購入する</span>
+        <span class="btn-label">NO　使わない / 持っていない</span>
+        <span class="btn-desc">今から新たに<br>購入する</span>
       </button>
     </div>
   </div>
@@ -709,7 +709,7 @@ function updateSummary() {
   const bar = document.getElementById('summary-bar');
   const chips = [];
   if (state.device) chips.push(deviceLabels[state.device]);
-  if (state.hasCrypto !== null) chips.push(state.hasCrypto ? '✅ 暗号通貨あり' : '❌ 暗号通貨なし');
+  if (state.hasCrypto !== null) chips.push(state.hasCrypto ? '✅ 暗号通貨を使う' : '❌ 新規購入');
   if (state.hasMM !== null) chips.push(state.hasMM ? '🦊 MetaMaskあり' : '📥 MetaMaskなし');
   if (state.purchase) chips.push(state.purchase === 'card' ? '💳 クレカ購入' : '🏦 銀行入金');
 

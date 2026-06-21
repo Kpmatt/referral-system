@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UniPoot ETH準備 フローチャート</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Space+Mono:wght@700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #f8f8fc;
+    --white: #ffffff;
+    --purple: #7b4fe0;
+    --purple-l: #ede8ff;
+    --purple-d: #5a35b0;
+    --teal: #00c49a;
+    --teal-l: #e0faf4;
+    --orange: #f5a623;
+    --orange-l: #fff4e0;
+    --red: #e94560;
+    --red-l: #ffeef1;
+    --gray: #666880;
+    --gray-l: #f0f0f5;
+    --dark: #1a1a2e;
+    --border: #e0e0ee;
+    --shadow: 0 2px 12px rgba(123,79,224,0.10);
+    --shadow-hover: 0 6px 24px rgba(123,79,224,0.18);
+  }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    padding: 0 0 60px 0;
+  }
+
+  /* Header */
+  .header {
+    background: var(--dark);
+    padding: 20px 24px 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-logo {
+    font-size: 22px;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: -0.02em;
+  }
+  .header-title {
+    font-size: 13px;
+    color: rgba(255,255,255,0.7);
+    font-weight: 500;
+  }
+  .header-badge {
+    margin-left: auto;
+    background: var(--purple);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+
+  /* Progress bar */
+  .progress-bar {
+    height: 3px;
+    background: var(--border);
+    position: relative;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--purple), var(--teal));
+    width: 0%;
+    transition: width 0.4s ease;
+  }
+
+  /* Main flow container */
+  .flow-container {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 32px 20px 0;
+  }
+
+  /* Intro */
+  .intro {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  .intro h2 {
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--dark);
+    margin-bottom: 8px;
+  }
+  .intro p {
+    font-size: 13px;
+    color: var(--gray);
+    line-height: 1.7;
+  }
+
+  /* STEP card */
+  .step-card {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 28px 24px 24px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+    display: none;
+    animation: slideIn 0.3s ease;
+  }
+  .step-card.active { display: block; }
+  .step-card.answered {
+    display: block;
+    opacity: 0.55;
+    pointer-events: none;
+  }
+  .step-card.answered::after {
+    content: '✓ 選択済み';
+    display: block;
+    text-align: right;
+    font-size: 11px;
+    color: var(--teal);
+    font-weight: 700;
+    margin-top: 8px;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .step-num {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--purple);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .step-dot {
+    width: 6px; height: 6px;
+    background: var(--purple);
+    border-radius: 50%;
+  }
+
+  .step-question {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--dark);
+    line-height: 1.5;
+    margin-bottom: 6px;
+  }
+  .step-sub {
+    font-size: 12px;
+    color: var(--gray);
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+
+  /* Choice buttons */
+  .choices {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .choices.row {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .choice-btn {
+    flex: 1;
+    min-width: 140px;
+    background: var(--white);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .choice-btn:hover {
+    border-color: var(--purple);
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-2px);
+  }
+  .choice-btn:active { transform: translateY(0); }
+
+  .choice-btn.style-yes { border-color: var(--teal); }
+  .choice-btn.style-yes:hover { background: var(--teal-l); }
+  .choice-btn.style-no { border-color: var(--orange); }
+  .choice-btn.style-no:hover { background: var(--orange-l); }
+  .choice-btn.style-purple:hover { background: var(--purple-l); }
+
+  .btn-icon { font-size: 22px; margin-bottom: 6px; display: block; }
+  .btn-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--dark);
+    display: block;
+    margin-bottom: 3px;
+  }
+  .btn-desc {
+    font-size: 11px;
+    color: var(--gray);
+    line-height: 1.5;
+  }
+
+  /* Device grid */
+  .device-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .device-btn {
+    background: var(--white);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 14px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+  }
+  .device-btn:hover {
+    border-color: var(--purple);
+    background: var(--purple-l);
+    transform: translateY(-2px);
+  }
+  .device-btn .d-icon { font-size: 28px; margin-bottom: 6px; display: block; }
+  .device-btn .d-name { font-size: 13px; font-weight: 700; color: var(--dark); }
+  .device-btn .d-hint { font-size: 10px; color: var(--gray); margin-top: 2px; }
+
+  /* Result card */
+  .result-card {
+    background: var(--white);
+    border: 2px solid var(--purple);
+    border-radius: 16px;
+    padding: 28px 24px;
+    display: none;
+    animation: slideIn 0.35s ease;
+    box-shadow: 0 4px 24px rgba(123,79,224,0.15);
+  }
+  .result-card.active { display: block; }
+
+  .result-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .result-icon {
+    width: 48px; height: 48px;
+    background: var(--purple-l);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+  .result-title { font-size: 15px; font-weight: 700; color: var(--dark); }
+  .result-method { font-size: 11px; color: var(--purple); font-weight: 700; margin-top: 2px; }
+
+  .result-device-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--dark);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+  }
+
+  /* Steps list in result */
+  .result-steps { list-style: none; }
+  .result-steps li {
+    display: flex;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--gray-l);
+    font-size: 13px;
+    color: var(--dark);
+    line-height: 1.6;
+    align-items: flex-start;
+  }
+  .result-steps li:last-child { border-bottom: none; }
+  .step-n {
+    width: 22px; height: 22px;
+    background: var(--purple);
+    color: #fff;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* Note box */
+  .note {
+    background: var(--orange-l);
+    border: 1px solid var(--orange);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 12px;
+    color: #664400;
+    line-height: 1.6;
+    margin-top: 16px;
+    display: flex;
+    gap: 8px;
+  }
+  .note-icon { flex-shrink: 0; }
+
+  .info {
+    background: var(--purple-l);
+    border: 1px solid var(--purple);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 12px;
+    color: #331a6a;
+    line-height: 1.6;
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+  }
+
+  /* CTA button */
+  .cta-btn {
+    display: block;
+    width: 100%;
+    margin-top: 20px;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--purple), var(--purple-d));
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+    letter-spacing: 0.03em;
+  }
+  .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(123,79,224,0.35); }
+
+  /* Reset button */
+  .reset-btn {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    padding: 11px;
+    background: transparent;
+    color: var(--gray);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .reset-btn:hover { border-color: var(--gray); color: var(--dark); }
+
+  /* Connector line between cards */
+  .connector {
+    width: 2px;
+    height: 20px;
+    background: linear-gradient(var(--purple), var(--teal));
+    margin: 0 auto;
+    border-radius: 1px;
+    display: none;
+  }
+  .connector.show { display: block; }
+
+  /* Summary chips at top */
+  .summary-bar {
+    display: none;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+    padding: 12px 16px;
+    background: var(--purple-l);
+    border-radius: 12px;
+    border: 1px solid rgba(123,79,224,0.2);
+  }
+  .summary-bar.show { display: flex; }
+  .chip {
+    background: var(--white);
+    border: 1px solid rgba(123,79,224,0.3);
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--purple);
+  }
+
+  @media (max-width: 480px) {
+    .choices.row { flex-direction: column; }
+    .device-grid { grid-template-columns: 1fr 1fr; }
+    .step-question { font-size: 15px; }
+    .choice-btn { min-width: unset; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-logo">UniPoot</div>
+    <div class="header-title">ETH準備 かんたんガイド</div>
+  </div>
+  <div class="header-badge" id="step-badge">STEP 1/4</div>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<div class="flow-container">
+
+  <div class="intro">
+    <h2>あなたに合った手順を見つけよう</h2>
+    <p>メタマスクにETHを準備する方法についてお使いのデバイスや状況に合わせたガイドになります。</p>
+    <p style="margin-top:6px;">以下の質問に答えるだけで、最適な手順が表示されます。</p>
+  </div>
+
+  <!-- Summary bar -->
+  <div class="summary-bar" id="summary-bar"></div>
+
+  <!-- STEP 0: デバイス選択 -->
+  <div class="step-card active" id="card-device">
+    <div class="step-num"><span class="step-dot"></span>STEP 1</div>
+    <div class="step-question">使用するデバイスを教えてください</div>
+    <div class="step-sub">手順の表示がデバイスに合わせて最適化されます</div>
+    <div class="device-grid">
+      <button class="device-btn" onclick="selectDevice('iPhone')">
+        <span class="d-icon">🍎</span>
+        <div class="d-name">iPhone</div>
+        <div class="d-hint">iOS</div>
+      </button>
+      <button class="device-btn" onclick="selectDevice('Android')">
+        <span class="d-icon">🤖</span>
+        <div class="d-name">Android</div>
+        <div class="d-hint">スマートフォン</div>
+      </button>
+      <button class="device-btn" onclick="selectDevice('Mac')">
+        <span class="d-icon">💻</span>
+        <div class="d-name">MacBook</div>
+        <div class="d-hint">macOS</div>
+      </button>
+      <button class="device-btn" onclick="selectDevice('Windows')">
+        <span class="d-icon">🖥️</span>
+        <div class="d-name">Windows PC</div>
+        <div class="d-hint">パソコン</div>
+      </button>
+    </div>
+  </div>
+
+  <div class="connector" id="conn-1"></div>
+
+  <!-- STEP 1: 既存の暗号通貨 -->
+  <div class="step-card" id="card-crypto">
+    <div class="step-num"><span class="step-dot"></span>STEP 2</div>
+    <div class="step-question">すでに暗号通貨（仮想通貨）をお持ちですか？</div>
+    <div class="step-sub">別の取引所やウォレットにETHなどの暗号通貨がある場合はYESを選んでください</div>
+    <div class="choices row">
+      <button class="choice-btn style-yes" onclick="selectCrypto(true)">
+        <span class="btn-icon">✅</span>
+        <span class="btn-label">YES　持っている</span>
+        <span class="btn-desc">取引所・ウォレットに<br>すでに暗号通貨がある</span>
+      </button>
+      <button class="choice-btn style-no" onclick="selectCrypto(false)">
+        <span class="btn-icon">❌</span>
+        <span class="btn-label">NO　持っていない</span>
+        <span class="btn-desc">今から日本円で<br>購入する</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="connector" id="conn-2"></div>
+
+  <!-- STEP 2a: MetaMask持ってる? (crypto=yes の場合) -->
+  <div class="step-card" id="card-mm-yn">
+    <div class="step-num"><span class="step-dot"></span>STEP 3</div>
+    <div class="step-question">MetaMaskはすでにお持ちですか？</div>
+    <div class="step-sub">インストール済みでウォレットが作成されている場合はYESを選んでください</div>
+    <div class="choices row">
+      <button class="choice-btn style-yes" onclick="selectMM(true)">
+        <span class="btn-icon">🦊</span>
+        <span class="btn-label">YES　持っている</span>
+        <span class="btn-desc">MetaMaskインストール済み</span>
+      </button>
+      <button class="choice-btn style-no" onclick="selectMM(false)">
+        <span class="btn-icon">📥</span>
+        <span class="btn-label">NO　まだない</span>
+        <span class="btn-desc">まずインストールが必要</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- STEP 2b: 購入方法 (crypto=no の場合) -->
+  <div class="step-card" id="card-purchase">
+    <div class="step-num"><span class="step-dot"></span>STEP 3</div>
+    <div class="step-question">ETHの購入方法を選んでください</div>
+    <div class="step-sub">それぞれの特徴を参考に選んでください</div>
+    <div class="choices">
+      <button class="choice-btn style-purple" onclick="selectPurchase('card')">
+        <span class="btn-icon">💳</span>
+        <span class="btn-label">クレジットカードで購入</span>
+        <span class="btn-desc">MetaMask内で直接購入・口座開設不要・手数料3〜5%程度</span>
+      </button>
+      <button class="choice-btn style-purple" onclick="selectPurchase('bank')">
+        <span class="btn-icon">🏦</span>
+        <span class="btn-label">日本の銀行から送金（OKCoin Japan）</span>
+        <span class="btn-desc">日本円で安心購入・国内取引所経由・手数料が比較的安い</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="connector" id="conn-3"></div>
+
+  <!-- RESULTS -->
+
+  <!-- Result: 送金（MetaMaskあり） -->
+  <div class="result-card" id="result-transfer-yes">
+    <div class="result-header">
+      <div class="result-icon">📤</div>
+      <div>
+        <div class="result-title">他のウォレット・取引所からMetaMaskへ送金</div>
+        <div class="result-method">方法 2 — 送金</div>
+      </div>
+    </div>
+    <div id="device-badge-t1" class="result-device-badge"></div>
+    <ol class="result-steps">
+      <li><span class="step-n">1</span><span id="step-base-switch-t1">MetaMaskを開く → ネットワークを「Base」に切り替える</span></li>
+      <li><span class="step-n">2</span><span id="step-receive-t1">「受け取る」をタップ → アドレス（0x...）をコピー</span></li>
+      <li><span class="step-n">3</span><span>送金元の取引所・ウォレットのアプリまたはウェブサイトを開き、ログインする<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">スマホの場合はアプリを起動。PCの場合はブラウザで取引所のサイトにアクセスし、メールアドレスとパスワードでログインしてください。</span></span></li>
+      <li><span class="step-n">4</span><span>「送金」「出金」「Withdraw」などのメニューを探してタップ・クリックする<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">メニューの場所は取引所によって異なります。画面下部・上部・ハンバーガーメニュー（三本線）の中などにあることが多いです。</span>
+        <span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">※ ETHをお持ちでない場合：まず「両替」「スワップ」「Convert」メニューを開き、保有中のUSDT・BTC等を「ETH」に変換してから送金へ進んでください。</span></span></li>
+      <li><span class="step-n">5</span><span>送金する通貨で「<b>ETH</b>」を選択する<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">通貨の検索欄に「ETH」と入力すると見つかりやすいです。BTC・USDTなど他の通貨と間違えないよう注意してください。</span></span></li>
+      <li><span class="step-n">6</span><span>ネットワークで「<b>Base</b>」を選択する（Ethereum Mainnetではない）<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">ネットワーク選択肢が表示されたら必ず「Base」を選択してください。「Ethereum」「ERC20」「BSC」などは別のネットワークです。Baseを選ぶことで手数料が安くなります。</span></span></li>
+      <li><span class="step-n">7</span><span>送金先アドレス欄に、コピーしたMetaMaskのBaseアドレスを貼り付ける<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">アドレス入力欄を長押し（スマホ）またはCtrl+V（PC）で貼り付けます。貼り付け後、先頭と末尾のアドレスが合っているか目視で確認してください。</span></span></li>
+      <li><span class="step-n">8</span><span>送金額を入力し、手数料（ガス代）を確認してから送金を実行する<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">Baseネットワークの送金手数料は通常$0.01〜$0.10程度と非常に安価です。「最大」「MAX」ボタンを使う場合、手数料分が差し引かれた額が送金されます。二段階認証（メール・SMS・アプリ）が求められたらコードを入力して完了してください。</span></span></li>
+      <li><span class="step-n">9</span><span>MetaMaskのBase ETH残高に反映されるのを確認する<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">通常数分〜数時間で反映されます。MetaMaskアプリを開き、ネットワークがBaseになっている状態でETHの残高が増えていれば成功です。</span></span></li>
+    </ol>
+    <div class="note" style="border-color:#e94560;background:#fff0f3;"><span class="note-icon">🚨</span><span style="color:#c0001a;font-weight:700;">アドレスが一文字でも間違うと受け取れないため、前後にスペースが入っていたり違うアドレスになっていたりしていないかを確認の上、送付してください。</span></div>
+    <div class="note"><span class="note-icon">⚠️</span><span>ネットワーク選択を間違えると資産が届きません。必ず「<b>Base</b>」を選択してください。送金手数料（ガス代）分の残高も確保しておきましょう。</span></div>
+    <div class="info"><span>💡</span><span>Coinbase、Binance、OKX、Bybitなど主要取引所はBaseネットワークへの出金に対応しています。</span></div>
+    <button class="cta-btn">✅ MetaMask残高の確認後、UniPoot設定ガイドへ進む</button>
+    <button class="reset-btn" onclick="resetFlow()">← 最初からやり直す</button>
+  </div>
+
+  <!-- Result: 送金（MetaMaskなし → インストール → 送金） -->
+  <div class="result-card" id="result-transfer-no">
+    <div class="result-header">
+      <div class="result-icon">📥</div>
+      <div>
+        <div class="result-title">MetaMaskをインストールしてから送金</div>
+        <div class="result-method">事前準備 → 方法 2 — 送金</div>
+      </div>
+    </div>
+    <div id="device-badge-t2" class="result-device-badge"></div>
+    <ol class="result-steps">
+      <li><span class="step-n">1</span><span id="step-install-t2">App StoreまたはGoogle Playで「MetaMask」をインストール</span></li>
+      <li><span class="step-n">2</span><span>「新しいウォレットを作成」をタップ → パスワードを設定（8文字以上）<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">パスワードはMetaMaskアプリを開くときに使います。忘れないようにメモしておきましょう。英数字・記号を組み合わせた強力なパスワードが推奨されます。</span></span></li>
+      <li><span class="step-n">3</span><span>シークレットリカバリーフレーズ（12単語）を<b>紙に書いて安全な場所に保管</b>し、順番通りに入力して確認する<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">このフレーズがあれば別のデバイスでも資産を復元できます。スクリーンショットや写真での保存は危険です。必ず紙に手書きし、金庫など安全な場所に保管してください。</span></span></li>
+      <li><span class="step-n">4</span><span id="step-base-switch-t2">MetaMaskを開く → ネットワークを「Base」に切り替える</span></li>
+      <li><span class="step-n">5</span><span id="step-receive-t2">受取アドレス（0x...）を表示してコピーする</span></li>
+      <li><span class="step-n">6</span><span>送金元の取引所・ウォレットを開いてログインし「送金」「出金」「Withdraw」などのメニューを開く<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">ETHをお持ちでない場合は先に「両替」「スワップ」機能で保有コインをETHに換金してください。</span></span></li>
+      <li><span class="step-n">7</span><span>通貨「<b>ETH</b>」を選択し、ネットワークを「<b>Base</b>」に設定する<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">ネットワークの選択肢が複数ある場合、必ず「Base」を選んでください。Ethereum Mainnet（ERC20）ではありません。</span></span></li>
+      <li><span class="step-n">8</span><span>送金先アドレスにコピーしたMetaMaskのアドレスを貼り付け、金額を入力して送金を実行する<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">Baseネットワークのガス代（送金手数料）は通常$0.01〜$0.10程度です。二段階認証コードが求められたら入力して送金を完了させてください。</span></span></li>
+      <li><span class="step-n">9</span><span>MetaMaskのBase ETH残高に反映されていることを確認する<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">MetaMaskアプリを開き、ネットワークが「Base」の状態でETH残高が増えていれば送金完了です。通常数分〜数時間かかります。</span></span></li>
+    </ol>
+    <div class="note" style="border-color:#e94560;background:#fff0f3;"><span class="note-icon">🚨</span><span style="color:#c0001a;font-weight:700;">アドレスが一文字でも間違うと受け取れないため、前後にスペースが入っていたり違うアドレスになっていたりしていないかを確認の上、送付してください。</span></div>
+    <div class="note"><span class="note-icon">⚠️</span><span>リカバリーフレーズは絶対に他人に見せないでください。紛失すると資産を取り戻せません。</span></div>
+    <button class="cta-btn">✅ MetaMask残高の確認後、UniPoot設定ガイドへ進む</button>
+    <button class="reset-btn" onclick="resetFlow()">← 最初からやり直す</button>
+  </div>
+
+  <!-- Result: クレカ購入 -->
+  <div class="result-card" id="result-card-purchase">
+    <div class="result-header">
+      <div class="result-icon">💳</div>
+      <div>
+        <div class="result-title">MetaMaskのクレジットカードでETHを購入</div>
+        <div class="result-method">方法 1 — クレカ購入</div>
+      </div>
+    </div>
+    <div id="device-badge-c" class="result-device-badge"></div>
+    <ol class="result-steps">
+      <li><span class="step-n">1</span><span id="step-install-c">App StoreまたはGoogle Playで「MetaMask」をインストール</span></li>
+      <li><span class="step-n">2</span><span>「新しいウォレットを作成」をタップ → パスワードを設定（8文字以上）<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">MetaMaskアプリを開くたびに使うパスワードです。英数字・記号を組み合わせた強力なものを設定し、必ずメモしておきましょう。</span></span></li>
+      <li><span class="step-n">3</span><span>シークレットリカバリーフレーズ（12単語）を<b>紙に書いて安全な場所に保管</b>し、確認入力を完了する<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">このフレーズはウォレットの鍵です。絶対に他人に見せず、スクリーンショットも厳禁です。紙に手書きして金庫などに保管してください。</span></span></li>
+      <li><span class="step-n">4</span><span id="step-buy-c">MetaMaskアプリで「購入」または「Buy」をタップする</span></li>
+      <li><span class="step-n">5</span><span>購入するトークンで「<b>ETH</b>」を選び、ネットワークを「<b>Base</b>」に選択する<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">トークン一覧からETHを探してタップします。ネットワーク選択画面が出たら「Base」を選んでください。Ethereum Mainnetを選ぶと手数料が高くなるため注意が必要です。</span></span></li>
+      <li><span class="step-n">6</span><span>購入プロバイダー（Transak / MoonPay / Sardine など）を選択する<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">各プロバイダーで手数料や対応カードが異なります。画面に表示される手数料を確認して選んでください。Transakは日本のカードに比較的対応しています。</span></span></li>
+      <li><span class="step-n">7</span><span>購入金額を入力し、クレジットカード情報を入力する<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">最低購入額は$30〜$50程度です。カード番号・有効期限・セキュリティコード（CVV）を入力します。3Dセキュア（カード会社の本人認証）が求められることがあります。</span></span></li>
+      <li><span class="step-n">8</span><span>初回はKYC（本人確認）を完了する<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">パスポートまたは運転免許証の写真と顔写真の撮影が求められます。審査は通常数分〜数十分で完了します。一度完了すれば次回以降は不要です。</span></span></li>
+      <li><span class="step-n">9</span><span>購入完了後、MetaMaskのBase ETH残高に反映されることを確認する<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">通常数分〜数時間で反映されます。MetaMaskを開きネットワークが「Base」になっている状態でETH残高を確認してください。</span></span></li>
+    </ol>
+    <div class="note"><span class="note-icon">💡</span><span>手数料は3〜5%程度かかります。少額から試す場合は最低$30〜$50程度からが目安です。</span></div>
+    <div class="info"><span>⚠️</span><span>KYCではパスポートまたは運転免許証が必要です。審査は通常数分〜数十分で完了します。</span></div>
+    <button class="cta-btn">✅ MetaMask残高の確認後、UniPoot設定ガイドへ進む</button>
+    <button class="reset-btn" onclick="resetFlow()">← 最初からやり直す</button>
+  </div>
+
+  <!-- Result: 銀行 → OKCoin -->
+  <div class="result-card" id="result-bank">
+    <div class="result-header">
+      <div class="result-icon">🏦</div>
+      <div>
+        <div class="result-title">日本円 → OKCoin Japan → ETH → MetaMask</div>
+        <div class="result-method">方法 3 — 国内取引所経由</div>
+      </div>
+    </div>
+    <p style="font-size:12px;color:#c0001a;font-weight:700;margin-bottom:16px;line-height:1.6;">下記ステップはあくまで一例です。既にお使いの国内取引所の口座をお持ちの場合はそちらをお使いいただくことも可能です。</p>
+    <div id="device-badge-b" class="result-device-badge"></div>
+
+    <div style="font-size:12px;color:var(--purple);font-weight:700;margin-bottom:12px;">■ STEP A　MetaMask インストール</div>
+    <ol class="result-steps">
+      <li><span class="step-n">1</span><span id="step-install-b">App StoreまたはGoogle Playで「MetaMask」をインストール</span></li>
+      <li><span class="step-n">2</span><span>「新しいウォレットを作成」をタップ → パスワードを設定（8文字以上）</span></li>
+      <li><span class="step-n">3</span><span>シークレットリカバリーフレーズ（12単語）を<b>紙に書いて安全な場所に保管</b> → 順番通りに入力して確認</span></li>
+      <li><span class="step-n">4</span><span id="step-erc20-a">ERC20（Ethereum Mainnet）の受取アドレスを確認してメモする</span></li>
+    </ol>
+
+    <div style="font-size:12px;color:var(--purple);font-weight:700;margin:16px 0 12px;">■ STEP B　OKCoin Japan 口座開設</div>
+    <ol class="result-steps">
+      <li><span class="step-n">1</span><span><a href="https://www.okcoin.jp/account/join?invitation=386D31C&type=0" target="_blank" rel="noopener" style="color:var(--purple);font-weight:700;">こちらをクリックしてOKCoin Japanの口座開設ページを開く</a> → 「口座開設」をクリック<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">リンクをタップ・クリックすると別のタブ（ウィンドウ）でOKCoinの登録ページが開きます。</span></span></li>
+      <li><span class="step-n">2</span><span>メールアドレスを入力し、パスワードを設定してメール認証を完了する<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">登録したメールアドレス宛に確認コードが届きます。メールを開いてコードをコピーし、画面の入力欄に貼り付けて認証を完了してください。迷惑メールフォルダも確認してみてください。</span></span></li>
+      <li><span class="step-n">3</span><span>本人確認（KYC）書類を提出する<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">マイナンバーカードまたは運転免許証の表面・裏面を撮影してアップロードします。その後、スマホのカメラで顔写真（セルフィー）の撮影が求められます。画像は鮮明に撮影し、文字が読めることを確認してください。</span></span></li>
+      <li><span class="step-n">4</span><span>審査完了メールを受信したら（通常1〜3営業日）、二段階認証（2FA）を設定する<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">審査完了メールが届いたらログインし、セキュリティ設定から二段階認証を有効にしてください。Google Authenticatorアプリの利用を推奨します。これで口座開設は完了です。</span></span></li>
+    </ol>
+
+    <div class="note" style="margin:12px 0 8px;"><span class="note-icon">⚠️</span><span>振込人名義はOKCoinの指定形式で入力してください。形式が違うと入金が反映されない場合があります。</span></div>
+    <div class="info" style="margin-bottom:16px;"><span>💡</span><span>OKCoin Japanは金融庁登録の国内取引所です。日本円での購入が安心かつ手数料も比較的安価です。</span></div>
+
+    <div style="font-size:12px;color:var(--purple);font-weight:700;margin:16px 0 12px;">■ STEP C　日本円入金</div>
+    <ol class="result-steps">
+      <li><span class="step-n">1</span><span>OKCoin Japanにログイン → 「資産」メニューをタップ → 「日本円入金」を選択する<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">ログイン後、画面下部または上部メニューの「資産」を開いてください。「日本円入金」ボタンをタップすると振込先情報が表示されます。</span></span></li>
+      <li><span class="step-n">2</span><span>表示された振込先銀行口座と振込人名義の形式をメモする<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">銀行名・支店名・口座番号・口座名義が表示されます。振込人名義は「カタカナ氏名＋OKCoin指定の番号」などの形式になっています。この形式と異なると入金が反映されないため必ず確認してください。</span></span></li>
+      <li><span class="step-n">3</span><span>自分の銀行アプリまたはネットバンキングを開き、表示された口座に振り込む<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">振込先口座番号と振込人名義（指定形式）を正確に入力してください。振込手数料は自己負担となります。ATMからの振り込みも可能ですが、ネットバンキングの方が便利です。</span></span></li>
+      <li><span class="step-n">4</span><span>OKCoinの資産画面で日本円残高が増えていることを確認する<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">通常当日〜翌営業日中に反映されます。反映後、OKCoinから確認メールが届く場合もあります。</span></span></li>
+    </ol>
+
+    <div style="font-size:12px;color:var(--purple);font-weight:700;margin:16px 0 12px;">■ STEP D　ETH購入</div>
+    <ol class="result-steps">
+      <li><span class="step-n">1</span><span>「資産」→「振替」を開き、入出金口座から取引口座へ日本円を振替する<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">OKCoinでは購入操作に「取引口座」の残高が必要です。「振替元：入出金口座」「振替先：取引口座」「通貨：JPY」を選択し、振替金額を入力して実行してください。</span></span></li>
+      <li><span class="step-n">2</span><span>「取引所」メニューをタップ・クリックし、「ETH/JPY」の取引ペアを選択する<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">画面上部または下部メニューから「取引所」を選択します。通貨ペア一覧が表示されたら検索欄に「ETH」と入力するか一覧から「ETH/JPY」を探してタップしてください。</span></span></li>
+      <li><span class="step-n">3</span><span>注文タイプを「指値」から「<b>成行</b>」に変更する<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">「指値」は価格を自分で指定する方法、「成行」は現在の市場価格ですぐに購入できる方法です。初めての方は「成行」を選ぶと簡単に購入できます。</span></span></li>
+      <li><span class="step-n">4</span><span>購入数量をJPY建てで入力するか、割合（25% / 50% / 75% / 100%）を選択し「ETHを購入」をタップする<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">「100%」を選ぶと取引口座の全額でETHを購入します。購入確認画面が表示されたら内容を確認して「確定」をタップしてください。</span></span></li>
+      <li><span class="step-n">5</span><span>購入完了後、「資産」→「振替」から取引口座の<b>ETH</b>を入出金口座へ振替する<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">「振替元：取引口座」「振替先：入出金口座」「通貨：ETH」を選択し、全額を振替してください。この振替が完了しないと次の出庫（送金）操作ができません。</span></span></li>
+    </ol>
+
+    <div style="font-size:12px;color:var(--purple);font-weight:700;margin:16px 0 12px;">■ STEP E　MetaMaskのERC20アドレスを確認</div>
+    <div class="info" style="margin-bottom:12px;"><span>ℹ️</span><span>OKCoinはBaseネットワークに対応していないため、ERC20（Ethereum Mainnet）で送金します。MetaMaskに届いたETHはUniPoot内のSwap→Bridgeでそのまま運用できます。</span></div>
+    <ol class="result-steps">
+      <li><span class="step-n">1</span><span id="step-erc20-e">MetaMaskを開いてEthereum Mainnet（ERC20）ネットワークを確認・切り替える</span></li>
+      <li><span class="step-n">2</span><span id="step-receive-e">受取画面を開いてERC20アドレス（0x...）をコピー・メモする<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">表示されたアドレスをタップしてコピー（スマホ）またはクリックしてコピー（PC）します。このアドレスをOKCoinの出庫先として使用します。メモ帳などに貼り付けておくと安全です。</span></span></li>
+    </ol>
+
+    <div style="font-size:12px;color:var(--purple);font-weight:700;margin:16px 0 12px;">■ STEP F　OKCoinからMetaMaskへ出庫（送金）</div>
+    <ol class="result-steps">
+      <li><span class="step-n">1</span><span>OKCoinで「資産」→「暗号資産出庫」を開き「ETH」を選択する<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">「暗号資産出庫」は資産を外部ウォレットに送金する機能です。メニューから選択すると出庫する通貨の一覧が表示されます。「ETH」を選んでください。</span></span></li>
+      <li><span class="step-n">2</span><span>ネットワークで「<b>ERC20</b>」を選択する<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">OKCoin JapanはBaseネットワークに対応していないため、必ず「ERC20」を選んでください。「ERC20」=「Ethereum Mainnet」です。間違えて他のネットワークを選ぶと資産が届きません。</span></span></li>
+      <li><span class="step-n">3</span><span>送金先アドレス欄にSTEP Eでコピーした<b>MetaMaskのERC20アドレス</b>を貼り付ける<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">入力欄を長押し（スマホ）またはCtrl+V（PC）でアドレスを貼り付けます。貼り付け後、アドレスの先頭数文字・末尾数文字がコピー元と一致しているか必ず目視で確認してください。<br>
+        <span style="color:#c0001a;font-weight:700;">🚨 アドレスが一文字でも間違うと受け取れないため、前後にスペースが入っていたり違うアドレスになっていたりしていないかを確認の上、送付してください。</span></span></li>
+      <li><span class="step-n">4</span><span>画面に表示される利用規約・注意事項のチェックボックスすべてにチェックを入れる<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">OKCoinは出庫前に複数の注意事項への同意を求めます。内容をよく読み、すべてチェックしてください。</span></span></li>
+      <li><span class="step-n">5</span><span>出庫数量を入力し、二段階認証コードを入力して「出庫する」をタップ・クリックする<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">出庫数量はETH単位で入力します。「全額」ボタンで入出金口座の全ETHを選択できます。二段階認証コードはGoogle AuthenticatorアプリまたはSMS・メールで届いた番号を入力してください。</span></span></li>
+      <li><span class="step-n">6</span><span>MetaMaskのEthereum Mainnet残高にETHが反映されることを確認する<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">通常数分〜数十分でMetaMaskに反映されます。MetaMaskを開き、ネットワークが「Ethereum Mainnet」の状態でETH残高が増えていれば出庫完了です。UniPoot内のSwap→BridgeでBaseネットワークへの変換も可能です。</span></span></li>
+    </ol>
+
+    <button class="cta-btn">✅ MetaMask残高の確認後、UniPoot設定ガイドへ進む</button>
+    <button class="reset-btn" onclick="resetFlow()">← 最初からやり直す</button>
+  </div>
+
+</div>
+
+<script>
+let state = { device: null, hasCrypto: null, hasMM: null, purchase: null };
+let stepCount = 1;
+
+const deviceLabels = {
+  iPhone: '🍎 iPhone',
+  Android: '🤖 Android',
+  Mac: '💻 MacBook',
+  Windows: '🖥️ Windows PC'
+};
+
+function updateProgress(current, total) {
+  document.getElementById('progress').style.width = (current / total * 100) + '%';
+  document.getElementById('step-badge').textContent = `STEP ${current}/${total}`;
+}
+
+function updateSummary() {
+  const bar = document.getElementById('summary-bar');
+  const chips = [];
+  if (state.device) chips.push(deviceLabels[state.device]);
+  if (state.hasCrypto !== null) chips.push(state.hasCrypto ? '✅ 暗号通貨あり' : '❌ 暗号通貨なし');
+  if (state.hasMM !== null) chips.push(state.hasMM ? '🦊 MetaMaskあり' : '📥 MetaMaskなし');
+  if (state.purchase) chips.push(state.purchase === 'card' ? '💳 クレカ購入' : '🏦 銀行入金');
+
+  if (chips.length > 0) {
+    bar.innerHTML = chips.map(c => `<span class="chip">${c}</span>`).join('');
+    bar.classList.add('show');
+  } else {
+    bar.classList.remove('show');
+  }
+}
+
+function setAnswered(cardId) {
+  const card = document.getElementById(cardId);
+  card.classList.remove('active');
+  card.classList.add('answered');
+}
+
+function showCard(cardId) {
+  const conn = document.getElementById('conn-' + (++stepCount));
+  if (conn) conn.classList.add('show');
+  const card = document.getElementById(cardId);
+  card.classList.add('active');
+  setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+}
+
+function showResult(resultId) {
+  const conn = document.getElementById('conn-3');
+  if (conn) conn.classList.add('show');
+  const result = document.getElementById(resultId);
+  result.classList.add('active');
+  setTimeout(() => result.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+  updateProgress(4, 4);
+}
+
+function setDeviceBadge(id) {
+  const badge = document.getElementById(id);
+  if (badge) badge.textContent = deviceLabels[state.device] || '';
+}
+
+function setHTML(id, html) {
+  const el = document.getElementById(id);
+  if (el) el.innerHTML = html;
+}
+
+function applyDeviceText() {
+  const d = state.device;
+  const isIPhone = d === 'iPhone';
+  const isAndroid = d === 'Android';
+  const isMobile = isIPhone || isAndroid;
+  const isPC = d === 'Mac' || d === 'Windows';
+
+  // ── インストール手順 ──
+  const installText = isIPhone ? 'App Storeで「MetaMask」をインストール'
+    : isAndroid ? 'Google Playで「MetaMask」をインストール'
+    : 'Chromeウェブストアから「MetaMask」拡張機能をインストール';
+  ['step-install-t2', 'step-install-c', 'step-install-b'].forEach(id => setHTML(id, installText));
+
+  // ── Baseネットワーク切替（result-transfer-yes）──
+  const baseSwitchHTML = isMobile
+    ? `MetaMaskアプリを起動 → 画面下部「トークン」タブをタップ → 「人気のネットワーク」をタップ → <b>Base</b> を選択 → 「Ethereum」をタップ → 「さらに表示」をタップ → 「受取」をタップ`
+    : `MetaMask拡張機能アイコンをクリック → 左上のネットワーク名をクリック → 一覧から「<b>Base</b>」を選択`;
+  setHTML('step-base-switch-t1', baseSwitchHTML);
+
+  // ── Baseネットワーク切替（result-transfer-no）──
+  setHTML('step-base-switch-t2', baseSwitchHTML);
+
+  // ── Base受取アドレスコピー（result-transfer-yes）──
+  const receiveBaseHTML = isMobile
+    ? `「受取」画面が表示されたら、アドレス（0x...）をタップしてコピー`
+    : `アカウント名の下に表示されているアドレス（0x...）をクリックしてコピー`;
+  setHTML('step-receive-t1', receiveBaseHTML);
+  setHTML('step-receive-t2', receiveBaseHTML);
+
+  // ── ERC20アドレス確認（result-bank STEP A）──
+  const erc20StepAHTML = isMobile
+    ? `MetaMaskアプリを起動 → 画面下部「トークン」タブをタップ → 「人気のネットワーク」をタップ → <b>Ethereum</b> を選択 → 「さらに表示」をタップ → 「受取」をタップ → 表示されたアドレス（0x...）をコピー・メモ<br>
+      <span style="font-size:12px;color:#555;">※ これがERC20アドレスです。OKCoinからの送金先として使用します</span>`
+    : `MetaMask拡張機能アイコンをクリック → 左上のネットワーク名をクリック → 「<b>Ethereum Mainnet</b>」を選択 → アカウント名の下のアドレス（0x...）をクリックしてコピー・メモ`;
+  setHTML('step-erc20-a', erc20StepAHTML);
+
+  // ── ERC20アドレス確認（result-bank STEP E）──
+  const erc20StepEHTML = isMobile
+    ? `MetaMaskアプリを起動 → 画面下部「トークン」タブをタップ → 「人気のネットワーク」をタップ → <b>Ethereum</b>（Ethereum Mainnet）を選択 → 「さらに表示」をタップ → 「受取」をタップ`
+    : `MetaMask拡張機能アイコンをクリック → 左上のネットワーク名をクリック → 「<b>Ethereum Mainnet</b>」を選択`;
+  setHTML('step-erc20-e', erc20StepEHTML);
+
+  const receiveERC20HTML = isMobile
+    ? `「受取」をタップ → 表示されたERC20アドレス（0x...）をコピー・メモ`
+    : `アカウント名の下に表示されているアドレス（0x...）をクリックしてコピー・メモ`;
+  setHTML('step-receive-e', receiveERC20HTML);
+
+  // ── クレカ購入ボタン ──
+  const buyEl = document.getElementById('step-buy-c');
+  if (buyEl) {
+    buyEl.textContent = isMobile
+      ? 'MetaMaskアプリで「購入」または「Buy」をタップ'
+      : 'MetaMask拡張機能を開き「購入」または「Buy」をクリック';
+  }
+}
+
+function selectDevice(device) {
+  state.device = device;
+  setAnswered('card-device');
+  document.getElementById('conn-1').classList.add('show');
+  showCard('card-crypto');
+  updateProgress(2, 4);
+  updateSummary();
+}
+
+function selectCrypto(has) {
+  state.hasCrypto = has;
+  setAnswered('card-crypto');
+  stepCount = 2;
+  document.getElementById('conn-2').classList.add('show');
+  if (has) {
+    showCard('card-mm-yn');
+  } else {
+    showCard('card-purchase');
+  }
+  updateProgress(3, 4);
+  updateSummary();
+}
+
+function selectMM(has) {
+  state.hasMM = has;
+  setAnswered('card-mm-yn');
+  applyDeviceText();
+  updateSummary();
+  if (has) {
+    setDeviceBadge('device-badge-t1');
+    showResult('result-transfer-yes');
+  } else {
+    setDeviceBadge('device-badge-t2');
+    showResult('result-transfer-no');
+  }
+}
+
+function selectPurchase(method) {
+  state.purchase = method;
+  setAnswered('card-purchase');
+  applyDeviceText();
+  updateSummary();
+  if (method === 'card') {
+    setDeviceBadge('device-badge-c');
+    showResult('result-card-purchase');
+  } else {
+    setDeviceBadge('device-badge-b');
+    showResult('result-bank');
+  }
+}
+
+function resetFlow() {
+  state = { device: null, hasCrypto: null, hasMM: null, purchase: null };
+  stepCount = 1;
+
+  // Reset all cards
+  ['card-device', 'card-crypto', 'card-mm-yn', 'card-purchase'].forEach(id => {
+    const el = document.getElementById(id);
+    el.classList.remove('active', 'answered');
+  });
+  document.getElementById('card-device').classList.add('active');
+
+  // Hide results
+  ['result-transfer-yes', 'result-transfer-no', 'result-card-purchase', 'result-bank'].forEach(id => {
+    document.getElementById(id).classList.remove('active');
+  });
+
+  // Hide connectors
+  ['conn-1', 'conn-2', 'conn-3'].forEach(id => {
+    document.getElementById(id).classList.remove('show');
+  });
+
+  document.getElementById('summary-bar').classList.remove('show');
+  updateProgress(1, 4);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+updateProgress(1, 4);
+</script>
+</body>
+</html>

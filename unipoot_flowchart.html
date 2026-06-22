@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>UniPoot ETH準備 フローチャート</title>
+<title>ETH準備 かんたんガイド</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Space+Mono:wght@700&display=swap');
 
@@ -422,7 +422,7 @@
 
 <div class="header">
   <div>
-    <div class="header-logo">UniPoot</div>
+    
     <div class="header-title">ETH準備 かんたんガイド</div>
   </div>
   <div class="header-badge" id="step-badge">STEP 1/4</div>
@@ -559,7 +559,7 @@
     <div class="note" style="border-color:#e94560;background:#fff0f3;"><span class="note-icon">🚨</span><span style="color:#c0001a;font-weight:700;">アドレスが一文字でも間違うと受け取れないため、前後にスペースが入っていたり違うアドレスになっていたりしていないかを確認の上、送付してください。</span></div>
     <div class="note"><span class="note-icon">⚠️</span><span>ネットワーク選択を間違えると資産が届きません。必ず「<b>Base</b>」を選択してください。送金手数料（ガス代）分の残高も確保しておきましょう。</span></div>
     <div class="info"><span>💡</span><span>Coinbase、Binance、OKX、Bybitなど主要取引所はBaseネットワークへの出金に対応しています。</span></div>
-    <button class="cta-btn">✅ MetaMask残高の確認後、UniPoot設定ガイドへ進む</button>
+    <button class="cta-btn">✅ MetaMask残高の確認後、次のステップ（設定ガイド）へ進む</button>
     <button class="reset-btn" onclick="resetFlow()">← 最初からやり直す</button>
   </div>
 
@@ -586,7 +586,7 @@
     </ol>
     <div class="note" style="border-color:#e94560;background:#fff0f3;"><span class="note-icon">🚨</span><span style="color:#c0001a;font-weight:700;">アドレスが一文字でも間違うと受け取れないため、前後にスペースが入っていたり違うアドレスになっていたりしていないかを確認の上、送付してください。</span></div>
     <div class="note"><span class="note-icon">⚠️</span><span>リカバリーフレーズは絶対に他人に見せないでください。紛失すると資産を取り戻せません。</span></div>
-    <button class="cta-btn">✅ MetaMask残高の確認後、UniPoot設定ガイドへ進む</button>
+    <button class="cta-btn">✅ MetaMask残高の確認後、次のステップ（設定ガイド）へ進む</button>
     <button class="reset-btn" onclick="resetFlow()">← 最初からやり直す</button>
   </div>
 
@@ -613,7 +613,7 @@
     </ol>
     <div class="note"><span class="note-icon">💡</span><span>手数料は3〜5%程度かかります。少額から試す場合は最低$30〜$50程度からが目安です。</span></div>
     <div class="info"><span>⚠️</span><span>KYCではパスポートまたは運転免許証が必要です。審査は通常数分〜数十分で完了します。</span></div>
-    <button class="cta-btn">✅ MetaMask残高の確認後、UniPoot設定ガイドへ進む</button>
+    <button class="cta-btn">✅ MetaMask残高の確認後、次のステップ（設定ガイド）へ進む</button>
     <button class="reset-btn" onclick="resetFlow()">← 最初からやり直す</button>
   </div>
 
@@ -666,7 +666,7 @@
     </ol>
 
     <div style="font-size:12px;color:var(--purple);font-weight:700;margin:16px 0 12px;">■ STEP E　MetaMaskのERC20アドレスを確認</div>
-    <div class="info" style="margin-bottom:12px;"><span>ℹ️</span><span>OKCoinはBaseネットワークに対応していないため、ERC20（Ethereum Mainnet）で送金します。MetaMaskに届いたETHはUniPoot内のSwap→Bridgeでそのまま運用できます。</span></div>
+    <div class="info" style="margin-bottom:12px;"><span>ℹ️</span><span>OKCoinはBaseネットワークに対応していないため、ERC20（Ethereum Mainnet）で送金します。MetaMaskに届いたETHはSwap→Bridgeでそのまま運用できます。</span></div>
     <ol class="result-steps">
       <li><span class="step-n">1</span><span id="step-erc20-e">MetaMaskを開いてEthereum Mainnet（ERC20）ネットワークを確認・切り替える</span></li>
       <li><span class="step-n">2</span><span id="step-receive-e">受取画面を開いてERC20アドレス（0x...）をコピー・メモする<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">表示されたアドレスをタップしてコピー（スマホ）またはクリックしてコピー（PC）します。このアドレスをOKCoinの出庫先として使用します。メモ帳などに貼り付けておくと安全です。</span></span></li>
@@ -680,10 +680,10 @@
         <span style="color:#c0001a;font-weight:700;">🚨 アドレスが一文字でも間違うと受け取れないため、前後にスペースが入っていたり違うアドレスになっていたりしていないかを確認の上、送付してください。</span></span></li>
       <li><span class="step-n">4</span><span>画面に表示される利用規約・注意事項のチェックボックスすべてにチェックを入れる<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">OKCoinは出庫前に複数の注意事項への同意を求めます。内容をよく読み、すべてチェックしてください。</span></span></li>
       <li><span class="step-n">5</span><span>出庫数量を入力し、二段階認証コードを入力して「出庫する」をタップ・クリックする<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">出庫数量はETH単位で入力します。「全額」ボタンで入出金口座の全ETHを選択できます。二段階認証コードはGoogle AuthenticatorアプリまたはSMS・メールで届いた番号を入力してください。</span></span></li>
-      <li><span class="step-n">6</span><span>MetaMaskのEthereum Mainnet残高にETHが反映されることを確認する<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">通常数分〜数十分でMetaMaskに反映されます。MetaMaskを開き、ネットワークが「Ethereum Mainnet」の状態でETH残高が増えていれば出庫完了です。UniPoot内のSwap→BridgeでBaseネットワークへの変換も可能です。</span></span></li>
+      <li><span class="step-n">6</span><span>MetaMaskのEthereum Mainnet残高にETHが反映されることを確認する<span style="display:block;font-size:11.5px;color:#555;line-height:1.7;margin-top:4px;padding-left:4px;">通常数分〜数十分でMetaMaskに反映されます。MetaMaskを開き、ネットワークが「Ethereum Mainnet」の状態でETH残高が増えていれば出庫完了です。Swap→BridgeでBaseネットワークへの変換も可能です。</span></span></li>
     </ol>
 
-    <button class="cta-btn">✅ MetaMask残高の確認後、UniPoot設定ガイドへ進む</button>
+    <button class="cta-btn">✅ MetaMask残高の確認後、次のステップ（設定ガイド）へ進む</button>
     <button class="reset-btn" onclick="resetFlow()">← 最初からやり直す</button>
   </div>
 
